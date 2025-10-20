@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="lb">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zuelen 20–99 (P3) – Unitéiten & Zéngern</title>
+  <style>
+    @font-face {
+      font-family: 'Schoulschrëft';
+      src: url('https://raw.githubusercontent.com/albrechtclaire1007/schoulschreft/main/schoulschreft_bold%5B2%5D.TTF') format('truetype');
+      font-weight: bold;
+      font-display: swap;
+    }
+
+    :root{
+      --bg:#ffffff;
+      --ink:#111;
+      --muted:#666;
+      --ok:#2e7d32;
+      --bad:#c62828;
+      --accent:#1976d2;
+      --tile:#f4f6f8;
+      --tileHover:#e9eef3;
+      --ring:#dbe6f7;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:'Schoulschrëft', system-ui, Arial, sans-serif;
+      line-height:1.4;
+      padding:16px;
+      min-height:100svh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .app{
+      width:min(100%, 980px);
+      background:#fff;
+      border:1px solid #eee;
+      border-radius:24px;
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+      padding:20px 20px 24px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    .badge{
+      font-size:14px;
+      padding:6px 12px;
+      background:var(--tile);
+      border-radius:999px;
+      border:1px solid #eee;
+    }
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:10px 14px;
+      background:var(--tile);
+      cursor:pointer;
+      font-family:inherit;
+      font-weight:700;
+    }
+    .btn:hover{ background:var(--tileHover); }
+
+    .word{
+      text-align:center;
+      font-size: clamp(28px, 4.4vw, 44px);
+      font-weight:700;
+      margin:10px 0 14px;
+      padding:12px 16px;
+      border-radius:16px;
+      background:linear-gradient(180deg,#fafcff,#f3f7fe);
+      border:1px solid var(--ring);
+    }
+
+    .row{
+      margin:16px 0 6px;
+    }
+    .row .label{
+      color:var(--muted);
+      font-size:16px;
+      margin:0 0 10px 6px;
+    }
+
+    .choices{
+      display:grid;
+      gap:10px;
+    }
+    /* Units: 10 circles across on wide screens, wrap nicely on small */
+    .choices.units{
+      grid-template-columns: repeat(10, minmax(44px, 1fr));
+    }
+    /* Tens: 9 pills */
+    .choices.tens{
+      grid-template-columns: repeat(9, minmax(60px, 1fr));
+    }
+
+    .chip{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      cursor:pointer;
+      padding:14px 0;
+      font-size: clamp(18px, 2.8vw, 26px);
+      font-weight:800;
+      background:var(--tile);
+      transition: transform .06s ease, background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+      border:2px solid transparent;
+    }
+    .chip.circle{
+      border-radius:999px;
+    }
+    .chip.pill{
+      border-radius:999px;
+      padding:14px 10px;
+    }
+    .chip:hover{
+      background:var(--tileHover);
+      transform:translateY(-1px);
+    }
+    .chip.selected{
+      border-color:var(--accent);
+      box-shadow:0 0 0 4px var(--ring) inset;
+    }
+    .chip.correct{
+      background: #e9f7ee;
+      border-color: var(--ok);
+      color: var(--ok);
+      box-shadow:0 0 0 4px rgba(46,125,50,.12) inset;
+    }
+    .chip.wrong{
+      background:#fdeaea;
+      border-color:var(--bad);
+      color:var(--bad);
+      box-shadow:0 0 0 4px rgba(198,40,40,.12) inset;
+      animation: shake .18s linear 2;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      50% { transform: translateX(3px); }
+      75% { transform: translateX(-2px); }
+      100% { transform: translateX(0); }
+    }
+
+    .footer{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:18px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .progress{
+      height:10px;
+      background:#f1f1f1;
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:6px;
+    }
+    .progress > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, #86b7ff, #1976d2);
+      transition: width .35s ease;
+    }
+
+    .done{
+      text-align:center;
+      padding:24px 12px 8px;
+    }
+    .done h2{
+      margin:0 0 10px;
+      font-size: clamp(28px, 4vw, 40px);
+    }
+    .done p{ margin:4px 0; }
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="P3 Zuelen 20–99 Spill">
+    <div class="topbar">
+      <div class="badge" id="countBadge">Beispill 1 / 25</div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" id="resetBtn" title="Spill nei starten">Zerécksetzen</button>
+        <button class="btn" id="skipBtn" title="Nächst Beispill">Iwwersprangen</button>
+      </div>
+    </div>
+
+    <div class="word" id="word">—</div>
+
+    <div class="row">
+      <div class="label">Unitéiten</div>
+      <div class="choices units" id="units"></div>
+    </div>
+
+    <div class="row">
+      <div class="label">Zéngere</div>
+      <div class="choices tens" id="tens"></div>
+    </div>
+
+    <div class="footer">
+      <div>
+        <div>Richteg Unitéiten an Zéngere ginn <b style="color:var(--ok)">gréng</b>. Falsch gëtt <b style="color:var(--bad)">rout</b>.</div>
+        <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+      </div>
+      <div id="scoreText">Punkten: <b id="score">0</b></div>
+    </div>
+
+    <div id="endScreen" class="done" style="display:none;">
+      <h2>Super gemaach! 🎉</h2>
+      <p>Du hues all 25 Beispiller gemaach.</p>
+      <p>Punkten: <b id="finalScore">0</b> / 25</p>
+      <button class="btn" id="againBtn">Nach eng Kéier spillen</button>
+    </div>
+  </div>
+
+  <script>
+    // -------------------------
+    // CONFIG: Edit examples here
+    // Each item: spelled-out word (Luxembourgish), the unit 0–9, and tens (10–90)
+    // -------------------------
+    const EXAMPLES = [
+      { word: "néngasiechzeg", unit: 9, tens: 60 }, // your example
+      { word: "dräiandrësseg", unit: 3, tens: 30 },
+      { word: "véieravéierzeg", unit: 4, tens: 40 },
+      { word: "fënnefafofzeg", unit: 5, tens: 50 },
+      { word: "siwenasiwwenzeg", unit: 7, tens: 70 },
+      { word: "achtanachtzeg", unit: 8, tens: 80 },
+      { word: "eenanzwanzeg", unit: 1, tens: 20 },
+      { word: "zweeanzwanzeg", unit: 2, tens: 20 },
+      { word: "sechsasechzeg", unit: 6, tens: 60 },
+      { word: "nénganonzeg", unit: 9, tens: 90 },
+      { word: "aachtanzwanzeg", unit: 8, tens: 20 },
+      { word: "dräianachtzeg", unit: 3, tens: 80 },
+      { word: "véieranonzeg", unit: 4, tens: 90 },
+      { word: "fënnefasiwwenzeg", unit: 5, tens: 70 },
+      { word: "sechsadrësseg", unit: 6, tens: 30 },
+      { word: "siwenavéierzeg", unit: 7, tens: 40 },
+      { word: "achtazwanzeg", unit: 8, tens: 20 },
+      { word: "zweeanonzeg", unit: 2, tens: 90 },
+      { word: "eenasechzeg", unit: 1, tens: 60 },
+      { word: "véieranfofzeg", unit: 4, tens: 50 },
+      { word: "dräiasiwwenzeg", unit: 3, tens: 70 },
+      { word: "sechsanonzeg", unit: 6, tens: 90 },
+      { word: "achtavéierzeg", unit: 8, tens: 40 },
+      { word: "siwenazwanzeg", unit: 7, tens: 20 },
+      { word: "fënnefanachtzeg", unit: 5, tens: 80 },
+    ];
+    const TOTAL = 25; // number of examples per round
+
+    // -------------------------
+    // DOM
+    // -------------------------
+    const wordEl   = document.getElementById('word');
+    const unitsEl  = document.getElementById('units');
+    const tensEl   = document.getElementById('tens');
+    const barEl    = document.getElementById('bar');
+    const scoreEl  = document.getElementById('score');
+    const scoreTxt = document.getElementById('scoreText');
+    const countBadge = document.getElementById('countBadge');
+    const endScreen  = document.getElementById('endScreen');
+    const finalScore = document.getElementById('finalScore');
+    const resetBtn   = document.getElementById('resetBtn');
+    const skipBtn    = document.getElementById('skipBtn');
+    const againBtn   = document.getElementById('againBtn');
+
+    // -------------------------
+    // State
+    // -------------------------
+    let deck = [];
+    let idx = 0;
+    let score = 0;
+    let lockedUnit = false;
+    let lockedTens = false;
+    let selectedUnit = null;
+    let selectedTens = null;
+
+    function shuffle(arr){
+      for(let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]] = [arr[j],arr[i]];
+      }
+      return arr;
+    }
+
+    function makeDeck(){
+      // Pick TOTAL unique examples; if EXAMPLES has > TOTAL, sample randomly
+      const pool = [...EXAMPLES];
+      shuffle(pool);
+      return pool.slice(0, TOTAL);
+    }
+
+    function renderNumberRows(){
+      // Units 0–9 as circles
+      unitsEl.innerHTML = '';
+      for(let u=0; u<=9; u++){
+        const btn = document.createElement('button');
+        btn.className = 'chip circle';
+        btn.textContent = String(u);
+        btn.setAttribute('data-unit', String(u));
+        btn.addEventListener('click', onUnitClick);
+        unitsEl.appendChild(btn);
+      }
+      // Tens 10..90 as pills
+      tensEl.innerHTML = '';
+      for(let t=10; t<=90; t+=10){
+        const btn = document.createElement('button');
+        btn.className = 'chip pill';
+        btn.textContent = String(t);
+        btn.setAttribute('data-tens', String(t));
+        btn.addEventListener('click', onTensClick);
+        tensEl.appendChild(btn);
+      }
+    }
+
+    function updateHUD(){
+      countBadge.textContent = `Beispill ${Math.min(idx+1, TOTAL)} / ${TOTAL}`;
+      scoreEl.textContent = String(score);
+      const pct = Math.round((idx / TOTAL) * 100);
+      barEl.style.width = pct + '%';
+    }
+
+    function showCard(){
+      lockedUnit = false;
+      lockedTens = false;
+      selectedUnit = null;
+      selectedTens = null;
+      // Clear styles
+      [...unitsEl.children].forEach(el => { el.classList.remove('selected','correct','wrong'); });
+      [...tensEl.children].forEach(el => { el.classList.remove('selected','correct','wrong'); });
+
+      const card = deck[idx];
+      wordEl.textContent = card.word;
+      updateHUD();
+    }
+
+    function flash(el, cls){
+      el.classList.add(cls);
+      setTimeout(()=> el.classList.remove(cls), 300);
+    }
+
+    function onUnitClick(e){
+      if (idx >= TOTAL) return;
+      const el = e.currentTarget;
+      if (lockedUnit) return;
+
+      // clear previous selection style
+      [...unitsEl.children].forEach(btn => btn.classList.remove('selected'));
+      el.classList.add('selected');
+
+      const choice = Number(el.getAttribute('data-unit'));
+      selectedUnit = choice;
+
+      const correct = deck[idx].unit;
+      if (choice === correct){
+        el.classList.remove('selected');
+        el.classList.add('correct'); // stay green
+        lockedUnit = true;
+        maybeAdvance();
+      } else {
+        flash(el,'wrong'); // brief red
+      }
+    }
+
+    function onTensClick(e){
+      if (idx >= TOTAL) return;
+      const el = e.currentTarget;
+      if (lockedTens) return;
+
+      [...tensEl.children].forEach(btn => btn.classList.remove('selected'));
+      el.classList.add('selected');
+
+      const choice = Number(el.getAttribute('data-tens'));
+      selectedTens = choice;
+
+      const correct = deck[idx].tens;
+      if (choice === correct){
+        el.classList.remove('selected');
+        el.classList.add('correct');
+        lockedTens = true;
+        maybeAdvance();
+      } else {
+        flash(el,'wrong');
+      }
+    }
+
+    function maybeAdvance(){
+      if (lockedUnit && lockedTens){
+        // Only award a point when both are correct (one point per card)
+        score += 1;
+        updateHUD();
+        setTimeout(()=>{
+          idx += 1;
+          if (idx >= TOTAL){
+            finish();
+          } else {
+            showCard();
+          }
+        }, 450); // short pause before next
+      }
+    }
+
+    function finish(){
+      wordEl.textContent = "—";
+      endScreen.style.display = "block";
+      finalScore.textContent = String(score);
+      // Dim choice rows
+      [...unitsEl.children, ...tensEl.children].forEach(b=>{
+        b.disabled = true;
+        b.style.opacity = .5;
+        b.style.cursor = 'default';
+      });
+      barEl.style.width = '100%';
+      countBadge.textContent = `Fäerdeg / ${TOTAL}`;
+    }
+
+    function reset(enableSameOrder=false){
+      endScreen.style.display = "none";
+      // re-enable buttons
+      [...unitsEl.children, ...tensEl.children].forEach(b=>{
+        b.disabled = false;
+        b.style.opacity = 1;
+        b.style.cursor = 'pointer';
+      });
+      score = 0;
+      idx = 0;
+      deck = enableSameOrder && deck.length ? [...deck] : makeDeck();
+      showCard();
+    }
+
+    // Controls
+    resetBtn.addEventListener('click', ()=> reset(false));
+    skipBtn.addEventListener('click', ()=>{
+      if (idx < TOTAL-1){
+        idx += 1;
+        showCard();
+      } else {
+        finish();
+      }
+    });
+    againBtn?.addEventListener('click', ()=> reset(false));
+
+    // Init
+    renderNumberRows();
+    reset(false);
+  </script>
+</body>
+</html>
