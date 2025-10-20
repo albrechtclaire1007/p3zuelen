@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zuelen 20–99 (P3) – Unitéiten & Zéngern</title>
+  <title>Zuelen 20–99 (P3) – Unitéiten & Zéngere</title>
   <style>
     @font-face {
       font-family: 'Schoulschrëft';
@@ -14,14 +14,19 @@
 
     :root{
       --bg:#ffffff;
-      --ink:#111;
-      --muted:#666;
+      --ink:#111111;
+      --muted:#50555b;
+
+      /* 👉 P3 blue (adjust if you have a specific hex) */
+      --accent:#2b7de9;
+      --ring:#d7e6ff;
+
       --ok:#2e7d32;
       --bad:#c62828;
-      --accent:#1976d2;
-      --tile:#f4f6f8;
-      --tileHover:#e9eef3;
-      --ring:#dbe6f7;
+
+      --tile:#ffffff;
+      --tileHover:#f6f8fb;
+      --border:#000000; /* black borders for chips */
     }
 
     *{box-sizing:border-box}
@@ -42,7 +47,7 @@
     .app{
       width:min(100%, 980px);
       background:#fff;
-      border:1px solid #eee;
+      border:1px solid #eaeaea;
       border-radius:24px;
       box-shadow:0 10px 30px rgba(0,0,0,.08);
       padding:20px 20px 24px;
@@ -59,18 +64,21 @@
     .badge{
       font-size:14px;
       padding:6px 12px;
-      background:var(--tile);
+      background:#f3f7fe;
       border-radius:999px;
-      border:1px solid #eee;
+      border:1px solid var(--ring);
+      color:#0c3c91;
     }
     .btn{
       border:none;
       border-radius:12px;
       padding:10px 14px;
-      background:var(--tile);
+      background:#f3f7fe;
+      color:#0c3c91;
       cursor:pointer;
       font-family:inherit;
       font-weight:700;
+      border:1px solid var(--ring);
     }
     .btn:hover{ background:var(--tileHover); }
 
@@ -83,11 +91,10 @@
       border-radius:16px;
       background:linear-gradient(180deg,#fafcff,#f3f7fe);
       border:1px solid var(--ring);
+      color:#0c3c91;
     }
 
-    .row{
-      margin:16px 0 6px;
-    }
+    .row{ margin:16px 0 6px; }
     .row .label{
       color:var(--muted);
       font-size:16px;
@@ -96,15 +103,15 @@
 
     .choices{
       display:grid;
-      gap:10px;
+      gap:12px;
     }
     /* Units: 10 circles across on wide screens, wrap nicely on small */
     .choices.units{
-      grid-template-columns: repeat(10, minmax(44px, 1fr));
+      grid-template-columns: repeat(10, minmax(52px, 1fr));
     }
     /* Tens: 9 pills */
     .choices.tens{
-      grid-template-columns: repeat(9, minmax(60px, 1fr));
+      grid-template-columns: repeat(9, minmax(68px, 1fr));
     }
 
     .chip{
@@ -114,39 +121,51 @@
       justify-content:center;
       user-select:none;
       cursor:pointer;
-      padding:14px 0;
-      font-size: clamp(18px, 2.8vw, 26px);
+      font-family:'Schoulschrëft', system-ui, Arial, sans-serif;
       font-weight:800;
       background:var(--tile);
-      transition: transform .06s ease, background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
-      border:2px solid transparent;
+      transition: transform .06s ease, background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+      color: var(--ink);
+      /* default border is black */
+      border:2px solid var(--border);
     }
+    /* True circles with white interior & black border */
     .chip.circle{
-      border-radius:999px;
+      aspect-ratio: 1/1;
+      border-radius: 999px;
+      width: 100%;
+      min-width: 48px;
+      min-height: 48px;
+      font-size: clamp(18px, 2.8vw, 28px);
+      background:#ffffff; /* white interior */
     }
+    /* Tens: rounded pills, also white interior & black border */
     .chip.pill{
-      border-radius:999px;
-      padding:14px 10px;
+      border-radius: 999px;
+      padding: 14px 10px;
+      font-size: clamp(18px, 2.6vw, 26px);
+      background:#ffffff; /* white interior */
     }
+
     .chip:hover{
       background:var(--tileHover);
       transform:translateY(-1px);
     }
     .chip.selected{
-      border-color:var(--accent);
       box-shadow:0 0 0 4px var(--ring) inset;
+      border-color: var(--accent);
     }
     .chip.correct{
-      background: #e9f7ee;
-      border-color: var(--ok);
-      color: var(--ok);
-      box-shadow:0 0 0 4px rgba(46,125,50,.12) inset;
+      background: #2e7d32; /* green fill */
+      color: #ffffff;      /* white text for contrast */
+      border-color: var(--border);
+      box-shadow:none;
     }
     .chip.wrong{
-      background:#fdeaea;
-      border-color:var(--bad);
-      color:var(--bad);
-      box-shadow:0 0 0 4px rgba(198,40,40,.12) inset;
+      background:#c62828; /* red fill */
+      color:#ffffff;
+      border-color: var(--border);
+      box-shadow:none;
       animation: shake .18s linear 2;
     }
     @keyframes shake {
@@ -170,16 +189,17 @@
 
     .progress{
       height:10px;
-      background:#f1f1f1;
+      background:#eef3ff;
       border-radius:999px;
       overflow:hidden;
       margin-top:6px;
+      border:1px solid var(--ring);
     }
     .progress > i{
       display:block;
       height:100%;
       width:0%;
-      background: linear-gradient(90deg, #86b7ff, #1976d2);
+      background: linear-gradient(90deg, #86b7ff, var(--accent));
       transition: width .35s ease;
     }
 
@@ -190,6 +210,7 @@
     .done h2{
       margin:0 0 10px;
       font-size: clamp(28px, 4vw, 40px);
+      color:#0c3c91;
     }
     .done p{ margin:4px 0; }
   </style>
@@ -200,7 +221,7 @@
       <div class="badge" id="countBadge">Beispill 1 / 25</div>
       <div style="display:flex; gap:8px;">
         <button class="btn" id="resetBtn" title="Spill nei starten">Zerécksetzen</button>
-        <button class="btn" id="skipBtn" title="Nächst Beispill">Iwwersprangen</button>
+        <!-- Iwwersprangen removed as requested -->
       </div>
     </div>
 
@@ -217,8 +238,7 @@
     </div>
 
     <div class="footer">
-      <div>
-        <div>Richteg Unitéiten an Zéngere ginn <b style="color:var(--ok)">gréng</b>. Falsch gëtt <b style="color:var(--bad)">rout</b>.</div>
+      <div style="min-width:220px; flex:1;">
         <div class="progress" aria-hidden="true"><i id="bar"></i></div>
       </div>
       <div id="scoreText">Punkten: <b id="score">0</b></div>
@@ -235,13 +255,12 @@
   <script>
     // -------------------------
     // CONFIG: Edit examples here
-    // Each item: spelled-out word (Luxembourgish), the unit 0–9, and tens (10–90)
     // -------------------------
     const EXAMPLES = [
       { word: "néngasiechzeg", unit: 9, tens: 60 }, // your example
       { word: "dräiandrësseg", unit: 3, tens: 30 },
       { word: "véieravéierzeg", unit: 4, tens: 40 },
-      { word: "fënnefafofzeg", unit: 5, tens: 50 },
+      { word: "fënneffofzeg", unit: 5, tens: 50 },
       { word: "siwenasiwwenzeg", unit: 7, tens: 70 },
       { word: "achtanachtzeg", unit: 8, tens: 80 },
       { word: "eenanzwanzeg", unit: 1, tens: 20 },
@@ -274,12 +293,10 @@
     const tensEl   = document.getElementById('tens');
     const barEl    = document.getElementById('bar');
     const scoreEl  = document.getElementById('score');
-    const scoreTxt = document.getElementById('scoreText');
     const countBadge = document.getElementById('countBadge');
     const endScreen  = document.getElementById('endScreen');
     const finalScore = document.getElementById('finalScore');
     const resetBtn   = document.getElementById('resetBtn');
-    const skipBtn    = document.getElementById('skipBtn');
     const againBtn   = document.getElementById('againBtn');
 
     // -------------------------
@@ -302,14 +319,13 @@
     }
 
     function makeDeck(){
-      // Pick TOTAL unique examples; if EXAMPLES has > TOTAL, sample randomly
       const pool = [...EXAMPLES];
       shuffle(pool);
       return pool.slice(0, TOTAL);
     }
 
     function renderNumberRows(){
-      // Units 0–9 as circles
+      // Units 0–9 as true circles
       unitsEl.innerHTML = '';
       for(let u=0; u<=9; u++){
         const btn = document.createElement('button');
@@ -317,6 +333,7 @@
         btn.textContent = String(u);
         btn.setAttribute('data-unit', String(u));
         btn.addEventListener('click', onUnitClick);
+        btn.setAttribute('aria-label', `Unitéit ${u}`);
         unitsEl.appendChild(btn);
       }
       // Tens 10..90 as pills
@@ -327,6 +344,7 @@
         btn.textContent = String(t);
         btn.setAttribute('data-tens', String(t));
         btn.addEventListener('click', onTensClick);
+        btn.setAttribute('aria-label', `Zéngere ${t}`);
         tensEl.appendChild(btn);
       }
     }
@@ -354,7 +372,7 @@
 
     function flash(el, cls){
       el.classList.add(cls);
-      setTimeout(()=> el.classList.remove(cls), 300);
+      setTimeout(()=> el.classList.remove(cls), 250);
     }
 
     function onUnitClick(e){
@@ -362,7 +380,6 @@
       const el = e.currentTarget;
       if (lockedUnit) return;
 
-      // clear previous selection style
       [...unitsEl.children].forEach(btn => btn.classList.remove('selected'));
       el.classList.add('selected');
 
@@ -372,11 +389,11 @@
       const correct = deck[idx].unit;
       if (choice === correct){
         el.classList.remove('selected');
-        el.classList.add('correct'); // stay green
+        el.classList.add('correct'); // green fill
         lockedUnit = true;
         maybeAdvance();
       } else {
-        flash(el,'wrong'); // brief red
+        flash(el,'wrong'); // red fill flash
       }
     }
 
@@ -404,8 +421,7 @@
 
     function maybeAdvance(){
       if (lockedUnit && lockedTens){
-        // Only award a point when both are correct (one point per card)
-        score += 1;
+        score += 1; // one point per completed card
         updateHUD();
         setTimeout(()=>{
           idx += 1;
@@ -414,7 +430,7 @@
           } else {
             showCard();
           }
-        }, 450); // short pause before next
+        }, 420);
       }
     }
 
@@ -422,7 +438,6 @@
       wordEl.textContent = "—";
       endScreen.style.display = "block";
       finalScore.textContent = String(score);
-      // Dim choice rows
       [...unitsEl.children, ...tensEl.children].forEach(b=>{
         b.disabled = true;
         b.style.opacity = .5;
@@ -432,9 +447,8 @@
       countBadge.textContent = `Fäerdeg / ${TOTAL}`;
     }
 
-    function reset(enableSameOrder=false){
+    function reset(){
       endScreen.style.display = "none";
-      // re-enable buttons
       [...unitsEl.children, ...tensEl.children].forEach(b=>{
         b.disabled = false;
         b.style.opacity = 1;
@@ -442,25 +456,18 @@
       });
       score = 0;
       idx = 0;
-      deck = enableSameOrder && deck.length ? [...deck] : makeDeck();
+      deck = makeDeck();
       showCard();
     }
 
     // Controls
-    resetBtn.addEventListener('click', ()=> reset(false));
-    skipBtn.addEventListener('click', ()=>{
-      if (idx < TOTAL-1){
-        idx += 1;
-        showCard();
-      } else {
-        finish();
-      }
-    });
-    againBtn?.addEventListener('click', ()=> reset(false));
+    resetBtn.addEventListener('click', reset);
+    againBtn?.addEventListener('click', reset);
 
     // Init
     renderNumberRows();
-    reset(false);
+    reset();
   </script>
 </body>
 </html>
+
