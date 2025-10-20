@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zuelen 20–99 (P3) – Unitéiten & Zéngere</title>
+  <title>P3 Zuelen 20–99 – 3 Spiller</title>
   <style>
     @font-face {
       font-family: 'Schoulschrëft';
@@ -16,248 +16,249 @@
       --bg:#ffffff;
       --ink:#111111;
       --muted:#50555b;
-
-      /* 👉 P3 blue (adjust if you have a specific hex) */
+      /* P3 blue */
       --accent:#2b7de9;
+      --accent-ink:#0c3c91;
       --ring:#d7e6ff;
-
       --ok:#2e7d32;
       --bad:#c62828;
-
+      --border:#000000;
       --tile:#ffffff;
       --tileHover:#f6f8fb;
-      --border:#000000; /* black borders for chips */
     }
 
-    *{box-sizing:border-box}
-
+    *{ box-sizing:border-box }
     body{
       margin:0;
       background:var(--bg);
       color:var(--ink);
       font-family:'Schoulschrëft', system-ui, Arial, sans-serif;
-      line-height:1.4;
-      padding:16px;
       min-height:100svh;
       display:flex;
       align-items:center;
       justify-content:center;
+      padding:16px;
     }
 
     .app{
-      width:min(100%, 980px);
+      width:min(100%, 1080px);
       background:#fff;
       border:1px solid #eaeaea;
       border-radius:24px;
       box-shadow:0 10px 30px rgba(0,0,0,.08);
-      padding:20px 20px 24px;
+      padding:18px 18px 24px;
     }
 
     .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:10px;
-      flex-wrap:wrap;
+      display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
     }
     .badge{
-      font-size:14px;
-      padding:6px 12px;
-      background:#f3f7fe;
-      border-radius:999px;
-      border:1px solid var(--ring);
-      color:#0c3c91;
+      font-size:14px; padding:6px 12px; border-radius:999px;
+      background:#f3f7fe; color:var(--accent-ink); border:1px solid var(--ring);
     }
     .btn{
-      border:none;
-      border-radius:12px;
-      padding:10px 14px;
-      background:#f3f7fe;
-      color:#0c3c91;
-      cursor:pointer;
-      font-family:inherit;
-      font-weight:700;
-      border:1px solid var(--ring);
+      border:1px solid var(--ring); border-radius:12px; padding:10px 14px;
+      background:#f3f7fe; color:var(--accent-ink); cursor:pointer; font-weight:700;
     }
     .btn:hover{ background:var(--tileHover); }
 
+    /* Center navigation bar */
+    .nav{
+      display:flex; justify-content:center; gap:10px; margin:14px 0;
+    }
+    .tab{
+      border:2px solid var(--border); border-radius:999px; background:#fff;
+      padding:10px 16px; cursor:pointer; user-select:none; font-weight:800;
+    }
+    .tab.active{
+      background:var(--accent); color:#fff; border-color:var(--border);
+    }
+
+    .screen{ display:none; }
+    .screen.active{ display:block; }
+
     .word{
       text-align:center;
-      font-size: clamp(28px, 4.4vw, 44px);
+      font-size: clamp(26px, 4.2vw, 44px);
       font-weight:700;
-      margin:10px 0 14px;
+      margin:6px 0 12px;
       padding:12px 16px;
       border-radius:16px;
       background:linear-gradient(180deg,#fafcff,#f3f7fe);
       border:1px solid var(--ring);
-      color:#0c3c91;
+      color:var(--accent-ink);
     }
 
     .row{ margin:16px 0 6px; }
-    .row .label{
-      color:var(--muted);
-      font-size:16px;
-      margin:0 0 10px 6px;
-    }
+    .label{ color:var(--muted); font-size:16px; margin:0 0 8px 6px; }
 
-    .choices{
-      display:grid;
-      gap:12px;
-    }
-    /* Units: 10 circles across on wide screens, wrap nicely on small */
-    .choices.units{
-      grid-template-columns: repeat(10, minmax(52px, 1fr));
-    }
-    /* Tens: 9 pills */
-    .choices.tens{
-      grid-template-columns: repeat(9, minmax(68px, 1fr));
-    }
+    .choices{ display:grid; gap:12px; }
+    .choices.units{ grid-template-columns: repeat(10, minmax(52px, 1fr)); }
+    .choices.tens{ grid-template-columns: repeat(9, minmax(68px, 1fr)); }
 
     .chip{
-      position:relative;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      user-select:none;
-      cursor:pointer;
-      font-family:'Schoulschrëft', system-ui, Arial, sans-serif;
-      font-weight:800;
-      background:var(--tile);
-      transition: transform .06s ease, background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
-      color: var(--ink);
-      /* default border is black */
-      border:2px solid var(--border);
+      position:relative; display:flex; align-items:center; justify-content:center;
+      user-select:none; cursor:pointer; font-weight:800; color:var(--ink);
+      border:2px solid var(--border); background:#fff; transition:transform .06s ease, background .15s ease, color .15s ease;
     }
-    /* True circles with white interior & black border */
     .chip.circle{
-      aspect-ratio: 1/1;
-      border-radius: 999px;
-      width: 100%;
-      min-width: 48px;
-      min-height: 48px;
-      font-size: clamp(18px, 2.8vw, 28px);
-      background:#ffffff; /* white interior */
+      aspect-ratio:1/1; border-radius:999px; width:100%;
+      min-width:48px; min-height:48px; font-size: clamp(18px, 2.8vw, 28px);
     }
-    /* Tens: rounded pills, also white interior & black border */
     .chip.pill{
-      border-radius: 999px;
-      padding: 14px 10px;
-      font-size: clamp(18px, 2.6vw, 26px);
-      background:#ffffff; /* white interior */
+      border-radius:999px; padding:14px 10px; font-size: clamp(18px, 2.6vw, 26px);
     }
-
-    .chip:hover{
-      background:var(--tileHover);
-      transform:translateY(-1px);
-    }
-    .chip.selected{
-      box-shadow:0 0 0 4px var(--ring) inset;
-      border-color: var(--accent);
-    }
-    .chip.correct{
-      background: #2e7d32; /* green fill */
-      color: #ffffff;      /* white text for contrast */
-      border-color: var(--border);
-      box-shadow:none;
-    }
-    .chip.wrong{
-      background:#c62828; /* red fill */
-      color:#ffffff;
-      border-color: var(--border);
-      box-shadow:none;
-      animation: shake .18s linear 2;
-    }
+    .chip:hover{ background:var(--tileHover); transform:translateY(-1px); }
+    .chip.selected{ box-shadow:0 0 0 4px var(--ring) inset; border-color:var(--accent); }
+    .chip.correct{ background:var(--ok); color:#fff; }
+    .chip.wrong{ background:var(--bad); color:#fff; animation:shake .18s linear 2; }
     @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-3px); }
-      50% { transform: translateX(3px); }
-      75% { transform: translateX(-2px); }
-      100% { transform: translateX(0); }
+      0%{transform:translateX(0)} 25%{transform:translateX(-3px)} 50%{transform:translateX(3px)} 75%{transform:translateX(-2px)} 100%{transform:translateX(0)}
     }
 
-    .footer{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-top:18px;
-      flex-wrap:wrap;
-      color:var(--muted);
-      font-size:14px;
+    .footer{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:16px; flex-wrap:wrap; color:var(--muted); font-size:14px; }
+    .progress{ height:10px; background:#eef3ff; border-radius:999px; overflow:hidden; margin-top:4px; border:1px solid var(--ring); }
+    .progress > i{ display:block; height:100%; width:0%; background: linear-gradient(90deg, #86b7ff, var(--accent)); transition: width .35s ease; }
+
+    .done{ text-align:center; padding:24px 12px 8px; }
+    .done h2{ margin:0 0 10px; font-size: clamp(26px, 4vw, 38px); color:var(--accent-ink); }
+
+    /* ---- Game 2 circle & animation ---- */
+    .big-circle{
+      margin: 24px auto 0; width:min(60vmin, 420px); aspect-ratio:1/1; border-radius:999px;
+      border: 3px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center;
+      font-size: clamp(36px, 9vmin, 86px); font-weight:900; cursor:pointer; user-select:none;
+      transition: transform .2s ease;
+    }
+    .pop{ animation: pop .25s ease; }
+    @keyframes pop{
+      0%{ transform: scale(.85) }
+      70%{ transform: scale(1.06) }
+      100%{ transform: scale(1) }
     }
 
-    .progress{
-      height:10px;
-      background:#eef3ff;
-      border-radius:999px;
-      overflow:hidden;
-      margin-top:6px;
-      border:1px solid var(--ring);
+    /* ---- Game 3 typing ---- */
+    .type-wrap{
+      display:grid; grid-template-columns: 1fr 2fr; gap:18px; align-items:start;
     }
-    .progress > i{
-      display:block;
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, #86b7ff, var(--accent));
-      transition: width .35s ease;
+    .target{
+      display:flex; align-items:center; gap:18px; flex-wrap:wrap;
     }
+    .letter-boxes{
+      display:flex; gap:8px; flex-wrap:wrap; min-height:58px;
+    }
+    .box{
+      width:48px; height:56px; border:2px solid var(--border); background:#fff; border-radius:10px;
+      display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:900;
+    }
+    .box.correct{ background:#e9f7ee; border-color:var(--ok); color:var(--ok); }
+    .box.wrong{ background:#fdeaea; border-color:var(--bad); color:var(--bad); }
 
-    .done{
-      text-align:center;
-      padding:24px 12px 8px;
+    .keyboard{
+      margin-top:10px; display:grid; grid-template-columns: repeat(14, minmax(36px, 1fr)); gap:8px;
     }
-    .done h2{
-      margin:0 0 10px;
-      font-size: clamp(28px, 4vw, 40px);
-      color:#0c3c91;
+    .key{
+      border:2px solid var(--border); border-radius:10px; background:#fff; padding:10px 0; text-align:center; font-weight:900; cursor:pointer; user-select:none;
     }
-    .done p{ margin:4px 0; }
+    .key:hover{ background:var(--tileHover); }
+    .key.wide{ grid-column: span 2; }
   </style>
 </head>
 <body>
-  <div class="app" role="application" aria-label="P3 Zuelen 20–99 Spill">
+  <div class="app">
     <div class="topbar">
       <div class="badge" id="countBadge">Beispill 1 / 25</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn" id="resetBtn" title="Spill nei starten">Zerécksetzen</button>
-        <!-- Iwwersprangen removed as requested -->
+        <button class="btn" id="resetBtn">Zerécksetzen</button>
       </div>
     </div>
 
-    <div class="word" id="word">—</div>
-
-    <div class="row">
-      <div class="label">Unitéiten</div>
-      <div class="choices units" id="units"></div>
+    <!-- Center navigation -->
+    <div class="nav" role="tablist" aria-label="Spiller wielen">
+      <div class="tab active" data-screen="game1" role="tab" aria-selected="true">1. Unitéit &amp; Zéngere</div>
+      <div class="tab" data-screen="game2" role="tab" aria-selected="false">2. So d’Zuel</div>
+      <div class="tab" data-screen="game3" role="tab" aria-selected="false">3. Schreif d’Zuel</div>
     </div>
 
-    <div class="row">
-      <div class="label">Zéngere</div>
-      <div class="choices tens" id="tens"></div>
-    </div>
+    <!-- GAME 1 -->
+    <section id="game1" class="screen active" aria-label="Spill 1">
+      <div class="word" id="word">—</div>
 
-    <div class="footer">
-      <div style="min-width:220px; flex:1;">
-        <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+      <div class="row">
+        <div class="label">Unitéiten</div>
+        <div class="choices units" id="units"></div>
       </div>
-      <div id="scoreText">Punkten: <b id="score">0</b></div>
-    </div>
 
-    <div id="endScreen" class="done" style="display:none;">
-      <h2>Super gemaach! 🎉</h2>
-      <p>Du hues all 25 Beispiller gemaach.</p>
-      <p>Punkten: <b id="finalScore">0</b> / 25</p>
-      <button class="btn" id="againBtn">Nach eng Kéier spillen</button>
-    </div>
+      <div class="row">
+        <div class="label">Zéngere</div>
+        <div class="choices tens" id="tens"></div>
+      </div>
+
+      <div class="footer">
+        <div style="min-width:220px; flex:1;">
+          <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+        </div>
+        <div>Punkten: <b id="score">0</b></div>
+      </div>
+
+      <div id="endScreen" class="done" style="display:none;">
+        <h2>Super gemaach! 🎉</h2>
+        <p>Du hues all 25 Beispiller gemaach.</p>
+        <p>Punkten: <b id="finalScore">0</b> / 25</p>
+        <button class="btn" id="againBtn">Nach eng Kéier spillen</button>
+      </div>
+    </section>
+
+    <!-- GAME 2 -->
+    <section id="game2" class="screen" aria-label="Spill 2">
+      <div class="word">Klick op de Krees fir déi nächst Zuel</div>
+      <div class="big-circle" id="sayCircle" title="Klick fir déi nächst Zuel">—</div>
+      <div class="footer">
+        <div style="min-width:220px; flex:1;">
+          <div class="progress"><i id="bar2"></i></div>
+        </div>
+        <div>Beispill: <b id="count2">0</b></div>
+      </div>
+    </section>
+
+    <!-- GAME 3 -->
+    <section id="game3" class="screen" aria-label="Spill 3">
+      <div class="type-wrap">
+        <div class="target">
+          <div class="big-circle" id="spellCircle" style="width:min(40vmin, 320px); font-size:clamp(32px,7.2vmin,68px);">—</div>
+        </div>
+        <div>
+          <div class="letter-boxes" id="letterBoxes"></div>
+          <div class="keyboard" id="keyboard"></div>
+          <div class="footer" style="margin-top:14px;">
+            <div style="min-width:220px; flex:1;">
+              <div class="progress"><i id="bar3"></i></div>
+            </div>
+            <div>Ronn: <b id="count3">0</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
-    // -------------------------
-    // CONFIG: Edit examples here
-    // -------------------------
+    // ---------- DATA ----------
+    // Starter spellings (please replace with your official list as needed)
+    const NUMBER_WORDS = {
+      20:"zwanzeg", 21:"eenanzwanzeg", 22:"zweeanzwanzeg", 23:"dräiandzwanzeg", 24:"véieranzwanzeg", 25:"fënnefanzwanzeg", 26:"sechsanzwanzeg", 27:"siwenanzwanzeg", 28:"achtanzwanzeg", 29:"nénganzwanzeg",
+      30:"drësseg", 31:"eenandrësseg", 32:"zweeandrësseg", 33:"dräiandrësseg", 34:"véierandrësseg", 35:"fënnefandrësseg", 36:"sechsadrësseg", 37:"siwenadrësseg", 38:"achtadrësseg", 39:"néngandrësseg",
+      40:"véierzeg", 41:"eenavéierzeg", 42:"zweeavéierzeg", 43:"dräiavéierzeg", 44:"véieravéierzeg", 45:"fënnefavéierzeg", 46:"sechsavéierzeg", 47:"siwenavéierzeg", 48:"achtavéierzeg", 49:"néngavéierzeg",
+      50:"fofzeg", 51:"eenaffofzeg", 52:"zweeaffofzeg", 53:"dräiaffofzeg", 54:"véieraffofzeg", 55:"fënneffofzeg", 56:"sechsaffofzeg", 57:"siwenaffofzeg", 58:"achtaffofzeg", 59:"néngaffofzeg",
+      60:"sechzeg", 61:"eenasechzeg", 62:"zweeasechzeg", 63:"dräiasechzeg", 64:"véierasechzeg", 65:"fënnefasechzeg", 66:"sechsasechzeg", 67:"siwenasechzeg", 68:"achtasechzeg", 69:"néngasechzeg",
+      70:"siwwenzeg", 71:"eenasiwwenzeg", 72:"zweeasiwwenzeg", 73:"dräiasiwwenzeg", 74:"véierasiwwenzeg", 75:"fënnefasiwwenzeg", 76:"sechsasiwwenzeg", 77:"siwenasiwwenzeg", 78:"achtasiwwenzeg", 79:"néngasiwwenzeg",
+      80:"achtzeg", 81:"eenenachtzeg", 82:"zweeanachtzeg", 83:"dräianachtzeg", 84:"véieranachtzeg", 85:"fënnefanachtzeg", 86:"sechsanachtzeg", 87:"siwenanachtzeg", 88:"achtanachtzeg", 89:"nénganachtzeg",
+      90:"nonzeg", 91:"eenanonzeg", 92:"zweeanonzeg", 93:"dräianonzeg", 94:"véieranonzeg", 95:"fënnefanonzeg", 96:"sechsanonzeg", 97:"siwenanonzeg", 98:"achtanonzeg", 99:"nénganonzeg",
+      100:"honnert"
+    };
+
+    // Your custom set for Game 1 (spelled word + unit + tens)
     const EXAMPLES = [
-      { word: "néngasiechzeg", unit: 9, tens: 60 }, // your example
+      { word: "néngasiechzeg", unit: 9, tens: 60 }, // sample per your request earlier
       { word: "dräiandrësseg", unit: 3, tens: 30 },
       { word: "véieravéierzeg", unit: 4, tens: 40 },
       { word: "fënneffofzeg", unit: 5, tens: 50 },
@@ -267,27 +268,37 @@
       { word: "zweeanzwanzeg", unit: 2, tens: 20 },
       { word: "sechsasechzeg", unit: 6, tens: 60 },
       { word: "nénganonzeg", unit: 9, tens: 90 },
-      { word: "aachtanzwanzeg", unit: 8, tens: 20 },
+      { word: "zwanzeg", unit: 0, tens: 20 },
       { word: "dräianachtzeg", unit: 3, tens: 80 },
       { word: "véieranonzeg", unit: 4, tens: 90 },
       { word: "fënnefasiwwenzeg", unit: 5, tens: 70 },
       { word: "sechsadrësseg", unit: 6, tens: 30 },
       { word: "siwenavéierzeg", unit: 7, tens: 40 },
-      { word: "achtazwanzeg", unit: 8, tens: 20 },
+      { word: "achtanzwanzeg", unit: 8, tens: 20 },
       { word: "zweeanonzeg", unit: 2, tens: 90 },
       { word: "eenasechzeg", unit: 1, tens: 60 },
       { word: "véieranfofzeg", unit: 4, tens: 50 },
       { word: "dräiasiwwenzeg", unit: 3, tens: 70 },
       { word: "sechsanonzeg", unit: 6, tens: 90 },
       { word: "achtavéierzeg", unit: 8, tens: 40 },
-      { word: "siwenazwanzeg", unit: 7, tens: 20 },
+      { word: "siwenanzwanzeg", unit: 7, tens: 20 },
       { word: "fënnefanachtzeg", unit: 5, tens: 80 },
     ];
-    const TOTAL = 25; // number of examples per round
+    const TOTAL = 25;
 
-    // -------------------------
-    // DOM
-    // -------------------------
+    // ---------- NAV ----------
+    const tabs = document.querySelectorAll('.tab');
+    const screens = document.querySelectorAll('.screen');
+    tabs.forEach(tab=>{
+      tab.addEventListener('click', ()=>{
+        tabs.forEach(t=>t.classList.remove('active'));
+        screens.forEach(s=>s.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.screen).classList.add('active');
+      });
+    });
+
+    // ---------- GAME 1 ----------
     const wordEl   = document.getElementById('word');
     const unitsEl  = document.getElementById('units');
     const tensEl   = document.getElementById('tens');
@@ -299,52 +310,29 @@
     const resetBtn   = document.getElementById('resetBtn');
     const againBtn   = document.getElementById('againBtn');
 
-    // -------------------------
-    // State
-    // -------------------------
-    let deck = [];
-    let idx = 0;
-    let score = 0;
-    let lockedUnit = false;
-    let lockedTens = false;
-    let selectedUnit = null;
-    let selectedTens = null;
+    let deck = [], idx = 0, score = 0;
+    let lockedUnit = false, lockedTens = false;
 
-    function shuffle(arr){
-      for(let i=arr.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [arr[i],arr[j]] = [arr[j],arr[i]];
-      }
-      return arr;
-    }
-
-    function makeDeck(){
-      const pool = [...EXAMPLES];
-      shuffle(pool);
-      return pool.slice(0, TOTAL);
-    }
+    function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+    function makeDeck(){ const pool=[...EXAMPLES]; shuffle(pool); return pool.slice(0,TOTAL); }
 
     function renderNumberRows(){
-      // Units 0–9 as true circles
       unitsEl.innerHTML = '';
       for(let u=0; u<=9; u++){
         const btn = document.createElement('button');
         btn.className = 'chip circle';
         btn.textContent = String(u);
-        btn.setAttribute('data-unit', String(u));
+        btn.dataset.unit = u;
         btn.addEventListener('click', onUnitClick);
-        btn.setAttribute('aria-label', `Unitéit ${u}`);
         unitsEl.appendChild(btn);
       }
-      // Tens 10..90 as pills
       tensEl.innerHTML = '';
       for(let t=10; t<=90; t+=10){
         const btn = document.createElement('button');
         btn.className = 'chip pill';
         btn.textContent = String(t);
-        btn.setAttribute('data-tens', String(t));
+        btn.dataset.tens = t;
         btn.addEventListener('click', onTensClick);
-        btn.setAttribute('aria-label', `Zéngere ${t}`);
         tensEl.appendChild(btn);
       }
     }
@@ -352,122 +340,207 @@
     function updateHUD(){
       countBadge.textContent = `Beispill ${Math.min(idx+1, TOTAL)} / ${TOTAL}`;
       scoreEl.textContent = String(score);
-      const pct = Math.round((idx / TOTAL) * 100);
-      barEl.style.width = pct + '%';
+      barEl.style.width = Math.round((idx / TOTAL) * 100) + '%';
     }
 
     function showCard(){
-      lockedUnit = false;
-      lockedTens = false;
-      selectedUnit = null;
-      selectedTens = null;
-      // Clear styles
-      [...unitsEl.children].forEach(el => { el.classList.remove('selected','correct','wrong'); });
-      [...tensEl.children].forEach(el => { el.classList.remove('selected','correct','wrong'); });
-
+      lockedUnit = lockedTens = false;
+      [...unitsEl.children].forEach(el=>el.className='chip circle');
+      [...tensEl.children].forEach(el=>el.className='chip pill');
       const card = deck[idx];
       wordEl.textContent = card.word;
       updateHUD();
     }
 
-    function flash(el, cls){
-      el.classList.add(cls);
-      setTimeout(()=> el.classList.remove(cls), 250);
-    }
+    function flash(el, cls){ el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 250); }
 
     function onUnitClick(e){
-      if (idx >= TOTAL) return;
+      if (idx >= TOTAL || lockedUnit) return;
       const el = e.currentTarget;
-      if (lockedUnit) return;
-
-      [...unitsEl.children].forEach(btn => btn.classList.remove('selected'));
-      el.classList.add('selected');
-
-      const choice = Number(el.getAttribute('data-unit'));
-      selectedUnit = choice;
-
+      const choice = Number(el.dataset.unit);
       const correct = deck[idx].unit;
-      if (choice === correct){
-        el.classList.remove('selected');
-        el.classList.add('correct'); // green fill
-        lockedUnit = true;
-        maybeAdvance();
-      } else {
-        flash(el,'wrong'); // red fill flash
-      }
+      if (choice === correct){ el.classList.add('correct'); lockedUnit = true; maybeAdvance(); }
+      else { flash(el,'wrong'); }
     }
-
     function onTensClick(e){
-      if (idx >= TOTAL) return;
+      if (idx >= TOTAL || lockedTens) return;
       const el = e.currentTarget;
-      if (lockedTens) return;
-
-      [...tensEl.children].forEach(btn => btn.classList.remove('selected'));
-      el.classList.add('selected');
-
-      const choice = Number(el.getAttribute('data-tens'));
-      selectedTens = choice;
-
+      const choice = Number(el.dataset.tens);
       const correct = deck[idx].tens;
-      if (choice === correct){
-        el.classList.remove('selected');
-        el.classList.add('correct');
-        lockedTens = true;
-        maybeAdvance();
-      } else {
-        flash(el,'wrong');
-      }
+      if (choice === correct){ el.classList.add('correct'); lockedTens = true; maybeAdvance(); }
+      else { flash(el,'wrong'); }
     }
-
     function maybeAdvance(){
       if (lockedUnit && lockedTens){
-        score += 1; // one point per completed card
+        score += 1;
         updateHUD();
         setTimeout(()=>{
           idx += 1;
-          if (idx >= TOTAL){
-            finish();
-          } else {
-            showCard();
-          }
+          if (idx >= TOTAL) finish(); else showCard();
         }, 420);
       }
     }
-
     function finish(){
       wordEl.textContent = "—";
       endScreen.style.display = "block";
       finalScore.textContent = String(score);
-      [...unitsEl.children, ...tensEl.children].forEach(b=>{
-        b.disabled = true;
-        b.style.opacity = .5;
-        b.style.cursor = 'default';
-      });
       barEl.style.width = '100%';
       countBadge.textContent = `Fäerdeg / ${TOTAL}`;
     }
-
-    function reset(){
+    function resetGame1(){
       endScreen.style.display = "none";
-      [...unitsEl.children, ...tensEl.children].forEach(b=>{
-        b.disabled = false;
-        b.style.opacity = 1;
-        b.style.cursor = 'pointer';
-      });
-      score = 0;
-      idx = 0;
-      deck = makeDeck();
+      score = 0; idx = 0; deck = makeDeck();
       showCard();
     }
 
-    // Controls
-    resetBtn.addEventListener('click', reset);
-    againBtn?.addEventListener('click', reset);
+    resetBtn.addEventListener('click', ()=>{ resetGame1(); resetGame2(); resetGame3(); });
+    againBtn?.addEventListener('click', resetGame1);
 
-    // Init
     renderNumberRows();
-    reset();
+    resetGame1();
+
+    // ---------- GAME 2 (So d’Zuel) ----------
+    const sayCircle = document.getElementById('sayCircle');
+    const bar2 = document.getElementById('bar2');
+    const count2 = document.getElementById('count2');
+    let list2 = [], i2 = 0;
+    function makeList2(){
+      const nums = [];
+      for(let n=20;n<=100;n++) nums.push(n);
+      return shuffle(nums).slice(0,30); // 30 quick prompts
+    }
+    function show2(){
+      sayCircle.textContent = list2[i2] ?? '—';
+      sayCircle.classList.remove('pop'); void sayCircle.offsetWidth; sayCircle.classList.add('pop');
+      bar2.style.width = Math.round((i2 / list2.length) * 100) + '%';
+      count2.textContent = String(i2);
+    }
+    function next2(){
+      i2++;
+      if (i2 >= list2.length){ i2 = 0; list2 = makeList2(); }
+      show2();
+    }
+    function resetGame2(){
+      list2 = makeList2(); i2 = 0; show2();
+    }
+    sayCircle.addEventListener('click', next2);
+    resetGame2();
+
+    // ---------- GAME 3 (Schreif d’Zuel) ----------
+    const spellCircle = document.getElementById('spellCircle');
+    const letterBoxes = document.getElementById('letterBoxes');
+    const keyboard = document.getElementById('keyboard');
+    const bar3 = document.getElementById('bar3');
+    const count3 = document.getElementById('count3');
+
+    const ALPHA = ['A','B','C','D','E','É','Ë','Ä','F','G','H','I','Ï','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+    let list3 = [], i3 = 0, targetWord = '', typed = [];
+
+    function makeList3(){
+      const pool = [];
+      for (let n=20;n<=100;n++){
+        if (NUMBER_WORDS[n]) pool.push(n);
+      }
+      return shuffle(pool).slice(0,20);
+    }
+
+    function nfc(str){ return str.normalize('NFC'); }
+
+    function setupKeyboard(){
+      keyboard.innerHTML = '';
+      ALPHA.forEach(ch=>{
+        const key = document.createElement('div');
+        key.className = 'key';
+        key.textContent = ch;
+        key.addEventListener('click', ()=> pushChar(ch.toLowerCase()));
+        keyboard.appendChild(key);
+      });
+      // controls
+      const back = document.createElement('div');
+      back.className = 'key wide';
+      back.textContent = 'Läschen';
+      back.addEventListener('click', popChar);
+      keyboard.appendChild(back);
+
+      const space = document.createElement('div');
+      space.className = 'key wide';
+      space.textContent = 'Spär';
+      space.addEventListener('click', ()=> pushChar(' '));
+      keyboard.appendChild(space);
+    }
+
+    function newRound3(){
+      typed = [];
+      const num = list3[i3];
+      spellCircle.textContent = String(num);
+      const word = NUMBER_WORDS[num] || '';
+      targetWord = nfc(word);
+      // Build boxes = number of letters (we include spaces if present; you can remove spaces by replacing)
+      letterBoxes.innerHTML = '';
+      const letters = [...targetWord];
+      letters.forEach(_=>{
+        const b = document.createElement('div');
+        b.className = 'box';
+        b.textContent = '';
+        letterBoxes.appendChild(b);
+      });
+      updateBars3();
+    }
+    function updateBars3(){
+      bar3.style.width = Math.round((i3 / list3.length) * 100) + '%';
+      count3.textContent = String(i3);
+    }
+
+    function pushChar(ch){
+      const boxes = [...letterBoxes.children];
+      if (typed.length >= boxes.length) return;
+      typed.push(ch);
+      boxes[typed.length-1].textContent = ch;
+      if (typed.length === boxes.length){
+        checkWord3();
+      }
+    }
+    function popChar(){
+      if (typed.length === 0) return;
+      const boxes = [...letterBoxes.children];
+      boxes[typed.length-1].textContent = '';
+      typed.pop();
+    }
+    function clearBoxesWrong(){
+      const boxes = [...letterBoxes.children];
+      boxes.forEach(b=>{ b.classList.add('wrong'); });
+      setTimeout(()=>{
+        boxes.forEach(b=>{ b.classList.remove('wrong'); b.textContent=''; });
+        typed = [];
+      }, 500);
+    }
+    function showBoxesCorrect(){
+      const boxes = [...letterBoxes.children];
+      boxes.forEach(b=>{ b.classList.add('correct'); });
+    }
+    function checkWord3(){
+      const guess = nfc(typed.join(''));
+      if (guess === targetWord){
+        showBoxesCorrect();
+        setTimeout(()=>{
+          i3++;
+          if (i3 >= list3.length){ list3 = makeList3(); i3 = 0; }
+          newRound3();
+        }, 500);
+      } else {
+        clearBoxesWrong();
+      }
+    }
+    function resetGame3(){
+      list3 = makeList3(); i3 = 0; setupKeyboard(); newRound3();
+    }
+    resetGame3();
+
+    // When switching to Game 3 or 2, give a tiny pop to circles
+    document.querySelector('[data-screen="game2"]').addEventListener('click', ()=>{ sayCircle.classList.add('pop'); setTimeout(()=>sayCircle.classList.remove('pop'), 260); });
+    document.querySelector('[data-screen="game3"]').addEventListener('click', ()=>{ spellCircle.classList.add('pop'); setTimeout(()=>spellCircle.classList.remove('pop'), 260); });
   </script>
 </body>
 </html>
+
 
