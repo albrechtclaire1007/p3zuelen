@@ -24,6 +24,7 @@
       --border:#000000;
       --tile:#ffffff;
       --tileHover:#f6f8fb;
+      --soft-red:#e53935; /* for linking a/an */
     }
 
     *{ box-sizing:border-box }
@@ -77,6 +78,7 @@
       margin:6px 0 12px; padding:12px 16px; border-radius:16px;
       background:linear-gradient(180deg,#fafcff,#f3f7fe); border:1px solid var(--ring); color:var(--accent-ink);
     }
+    .word .red{ color: var(--soft-red); }
 
     .row{ margin:16px 0 6px; }
     .label{ color:var(--muted); font-size:16px; margin:0 0 8px 6px; }
@@ -192,7 +194,7 @@
       </div>
 
       <div id="endScreen" class="done" style="display:none;">
-        <h2>Super gemaach! </h2>
+        <h2>Super gemaach! 🎉</h2>
         <p>Du hues all 25 Beispiller gemaach.</p>
         <p>Punkten: <b id="finalScore">0</b> / 25</p>
         <button class="btn" id="againBtn">Nach eng Kéier spillen</button>
@@ -241,7 +243,7 @@
       20:"zwanzeg", 21:"eenanzwanzeg", 22:"zweeanzwanzeg", 23:"dräiandzwanzeg", 24:"véieranzwanzeg", 25:"fënnefanzwanzeg", 26:"sechsanzwanzeg", 27:"siwenanzwanzeg", 28:"achtanzwanzeg", 29:"nénganzwanzeg",
       30:"drësseg", 31:"eenandrësseg", 32:"zweeandrësseg", 33:"dräiandrësseg", 34:"véierandrësseg", 35:"fënnefandrësseg", 36:"sechsadrësseg", 37:"siwenadrësseg", 38:"achtadrësseg", 39:"néngandrësseg",
       40:"véierzeg", 41:"eenavéierzeg", 42:"zweeavéierzeg", 43:"dräiavéierzeg", 44:"véieravéierzeg", 45:"fënnefavéierzeg", 46:"sechsavéierzeg", 47:"siwenavéierzeg", 48:"achtavéierzeg", 49:"néngavéierzeg",
-      50:"fofzeg", 51:"eenafofzeg", 52:"zweeafofzeg", 53:"dräiafofzeg", 54:"véierafofzeg", 55:"fënnefofzeg", 56:"sechsafofzeg", 57:"siwenafofzeg", 58:"achtafofzeg", 59:"néngafofzeg",
+      50:"fofzeg", 51:"eenaffofzeg", 52:"zweeaffofzeg", 53:"dräiaffofzeg", 54:"véieraffofzeg", 55:"fënneffofzeg", 56:"sechsaffofzeg", 57:"siwenaffofzeg", 58:"achtaffofzeg", 59:"néngaffofzeg",
       60:"siechzeg", 61:"eenasiechzeg", 62:"zweeasiechzeg", 63:"dräiasiechzeg", 64:"véierasiechzeg", 65:"fënnefasiechzeg", 66:"sechsasiechzeg", 67:"siwenasiechzeg", 68:"achtasiechzeg", 69:"néngasiechzeg",
       70:"siwwenzeg", 71:"eenasiwwenzeg", 72:"zweeasiwwenzeg", 73:"dräiasiwwenzeg", 74:"véierasiwwenzeg", 75:"fënnefasiwwenzeg", 76:"sechsasiwwenzeg", 77:"siwenasiwwenzeg", 78:"achtasiwwenzeg", 79:"néngasiwwenzeg",
       80:"achtzeg", 81:"eenenachtzeg", 82:"zweeanachtzeg", 83:"dräianachtzeg", 84:"véieranachtzeg", 85:"fënnefanachtzeg", 86:"sechsanachtzeg", 87:"siwenanachtzeg", 88:"achtanachtzeg", 89:"nénganachtzeg",
@@ -249,6 +251,7 @@
       100:"honnert"
     };
 
+    // Game 1 deck (word + unit + tens). Ensure 60-tens words use 'siechzeg'.
     const EXAMPLES = [
       { word: "néngasiechzeg", unit: 9, tens: 60 },
       { word: "dräiandrësseg", unit: 3, tens: 30 },
@@ -268,7 +271,7 @@
       { word: "siwenavéierzeg", unit: 7, tens: 40 },
       { word: "achtanzwanzeg", unit: 8, tens: 20 },
       { word: "zweeanonzeg", unit: 2, tens: 90 },
-      { word: "eenasechzeg", unit: 1, tens: 60 },
+      { word: "eenasiechzeg", unit: 1, tens: 60 },
       { word: "véieranfofzeg", unit: 4, tens: 50 },
       { word: "dräiasiwwenzeg", unit: 3, tens: 70 },
       { word: "sechsanonzeg", unit: 6, tens: 90 },
@@ -314,6 +317,27 @@
     function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
     function stripSpacesHyphens(s){ return s.replace(/[\s\-]/g,''); }
     function nfc(s){ return s.normalize('NFC'); }
+
+    // Tens roots incl. 'siechzeg'
+    const TENS_ROOTS = ["zwanzeg","drësseg","véierzeg","fofzeg","siechzeg","siwwenzeg","achtzeg","nonzeg"];
+
+    /** Highlight ONLY the linking "a" or "an" right before a tens root */
+    function highlightLinkingA(word) {
+      for (const root of TENS_ROOTS) {
+        const i = word.indexOf(root);
+        if (i > 0) {
+          const two = word.slice(i - 2, i);
+          const one = word.slice(i - 1, i);
+          if (two === "an") {
+            return word.slice(0, i - 2) + "<span class='red'>an</span>" + word.slice(i);
+          }
+          if (one === "a") {
+            return word.slice(0, i - 1) + "<span class='red'>a</span>" + word.slice(i);
+          }
+        }
+      }
+      return word;
+    }
 
     // ---------- GAME 1 ----------
     const wordEl   = document.getElementById('word');
@@ -364,7 +388,8 @@
       [...unitsEl.children].forEach(el=>el.className='chip circle');
       [...tensEl.children].forEach(el=>el.className='chip pill');
       const card = deck[idx];
-      wordEl.textContent = card.word;
+      // precise highlight only when "a/an" sits right before a tens root
+      wordEl.innerHTML = highlightLinkingA(card.word);
       updateHUD();
     }
 
@@ -443,7 +468,7 @@
     const undoBtn = document.getElementById('undoBtn');
     const clearBtn = document.getElementById('clearBtn');
 
-    let list3 = [], i3 = 0, targetWord = '', targetLetters = [], filled = []; // filled holds chosen letters indices
+    let list3 = [], i3 = 0, targetWord = '', targetLetters = [], filled = [];
 
     function makeList3(){
       const pool = [];
@@ -458,14 +483,13 @@
       const num = list3[i3];
       spellCircle.textContent = String(num);
 
-      // Strip spaces/hyphens from target for letter ordering
       const raw = NUMBER_WORDS[num] || '';
       targetWord = nfc(stripSpacesHyphens(raw));
       targetLetters = [...targetWord];
 
       // Build slots
       letterBoxes.innerHTML = '';
-      targetLetters.forEach((_)=>{
+      targetLetters.forEach(()=>{
         const b = document.createElement('div');
         b.className = 'box';
         b.textContent = '';
@@ -473,14 +497,14 @@
         letterBoxes.appendChild(b);
       });
 
-      // Build bank with exactly needed letters (including duplicates), shuffled
+      // Bank with exactly needed letters, shuffled
       letterBank.innerHTML = '';
       const bankLetters = shuffle([...targetLetters]);
       bankLetters.forEach((ch, idx)=>{
         const t = document.createElement('div');
         t.className = 'tile';
         t.textContent = ch;
-        t.dataset.index = idx; // bank index
+        t.dataset.index = idx;
         t.addEventListener('click', ()=> pickTile(t));
         letterBank.appendChild(t);
       });
@@ -494,16 +518,14 @@
     }
 
     function pickTile(tile){
-      // find first empty slot
       const boxes = [...letterBoxes.children];
       const emptyIndex = boxes.findIndex(b=> b.textContent === '');
       if (emptyIndex === -1) return;
 
       boxes[emptyIndex].textContent = tile.textContent;
       tile.classList.add('disabled');
-      filled.push(tile); // remember tile for undo
+      filled.push(tile);
 
-      // check if full
       if (boxes.every(b=> b.textContent !== '')){
         checkWord3();
       }
@@ -512,7 +534,6 @@
     function removeLast(){
       if (filled.length === 0) return;
       const boxes = [...letterBoxes.children];
-      // find last filled slot
       let lastFilled = boxes.length - 1;
       while (lastFilled >= 0 && boxes[lastFilled].textContent === '') lastFilled--;
       if (lastFilled < 0) return;
@@ -525,7 +546,6 @@
     function clearAll(){
       const boxes = [...letterBoxes.children];
       boxes.forEach(b=> b.textContent = '');
-      // re-enable all tiles
       const tiles = [...letterBank.children];
       tiles.forEach(t=> t.classList.remove('disabled'));
       filled = [];
@@ -569,6 +589,5 @@
   </script>
 </body>
 </html>
-
 
 
